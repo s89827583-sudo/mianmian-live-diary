@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fff7fb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="眠眠的直播日誌">
+<link rel="manifest" href="manifest.json">
+<title>眠眠的直播日誌 V2.6</title>
+<style>
+:root{--pink:#e89ab7;--pink2:#fff0f6;--text:#4b3f45;--muted:#927f88;--line:#f0dfe7;--bg:#fffafd;--card:#fff;--orange:#e99b42;--green:#8dbb9a}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#fff7fb 0,#fffafd 45%,#fdf7fa 100%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",sans-serif}
+button,input,textarea,select{font:inherit}button{border:0}.app{max-width:480px;margin:auto;min-height:100vh;padding-bottom:88px}
+header{padding:24px 20px 10px;display:flex;justify-content:space-between;align-items:center}.brand{font-weight:800;font-size:22px}.sub{font-size:12px;color:var(--muted);margin-top:3px}
+.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#fff;border:1px solid var(--line);font-size:22px}
+main{padding:8px 16px}.page{display:none}.page.active{display:block}
+.card{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:20px;padding:17px;margin:12px 0;box-shadow:0 6px 22px rgba(125,76,99,.06)}
+.card h3{margin:0 0 12px;font-size:15px}.muted{color:var(--muted);font-size:12px}.big{font-size:27px;font-weight:800}.pink{color:var(--pink)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{padding:14px;background:var(--pink2);border-radius:15px}.metric .label{font-size:12px;color:var(--muted)}.metric .v{font-size:19px;font-weight:800;margin-top:5px}
+.progress{height:10px;background:#f4e7ed;border-radius:99px;overflow:hidden;margin:8px 0}.bar{height:100%;background:linear-gradient(90deg,#e89ab7,#f3b8cb);border-radius:99px}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center}.btn{background:var(--pink);color:white;border-radius:14px;padding:11px 14px;font-weight:700}.btn.secondary{background:#fff0f6;color:#9c6079}.btn.small{padding:8px 10px;font-size:12px}
+label{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px}input,textarea,select{width:100%;border:1px solid var(--line);border-radius:13px;background:#fff;padding:11px;color:var(--text);outline:none}textarea{min-height:80px;resize:vertical}
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(480px,100%);background:rgba(255,255,255,.96);backdrop-filter:blur(15px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:9px 8px calc(9px + env(safe-area-inset-bottom));z-index:5}
+nav button{background:transparent;color:#9b8a92;font-size:11px;padding:5px 0}.navicon{display:block;font-size:21px;margin-bottom:2px}.activeNav{color:#d8799c!important;font-weight:800}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.day{min-height:67px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:7px 4px;font-size:10px;text-align:center}.day.today{border-color:#e99b42}.day .num{font-size:16px;font-weight:800;margin:4px}.shift{font-size:9px;background:#fff0f6;border-radius:7px;padding:3px;margin-top:3px;white-space:nowrap;overflow:hidden}
+.tabs{display:flex;gap:8px}.tabs button{flex:1;background:#f8edf2;color:#977f89;padding:9px;border-radius:12px}.tabs button.on{background:#e89ab7;color:#fff}
+.item{padding:13px 0;border-bottom:1px solid var(--line)}.item:last-child{border-bottom:0}.tag{display:inline-block;font-size:10px;border-radius:99px;padding:4px 7px;background:#fff0f6;color:#a65f7b}
+.switch{width:48px;height:28px;border-radius:20px;background:#d9cdd2;padding:3px;cursor:pointer}.switch i{display:block;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}.switch.on{background:#e89ab7}.switch.on i{transform:translateX(20px)}
+.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%) translateY(15px);background:#4d3f45;color:#fff;padding:10px 15px;border-radius:12px;font-size:12px;opacity:0;pointer-events:none;transition:.25s;z-index:20}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.notice{background:#fff7df;border:1px solid #f2dfad;color:#80662e;padding:10px;border-radius:12px;font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:11px}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line)}th{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div><div class="brand">🌸 眠眠的直播日誌</div><div class="sub" id="cycleLabel"></div></div><div class="avatar">🐕</div></header>
+<main>
+<section id="home" class="page active">
+<div class="card"><div class="muted">本期累計心動值</div><div class="big pink" id="homeHeart">0</div><div class="muted" id="tierLine"></div></div>
+<div class="grid2">
+<div class="metric"><div class="label">本週目標進度</div><div class="v" id="weekGoal">0%</div><div class="progress"><div class="bar" id="weekBar"></div></div><div class="muted">目標 300萬</div></div>
+<div class="metric"><div class="label">距離下一級距</div><div class="v" id="nextTier">—</div><div class="muted" id="nextTierPct"></div></div>
+<div class="metric"><div class="label">本期工作時數</div><div class="v" id="homeHours">0 小時</div></div>
+<div class="metric"><div class="label">預估當期收入</div><div class="v pink" id="homeIncome">$0</div></div>
+</div>
+<div class="card"><div class="row"><h3>本週工作安排</h3><button class="btn small secondary" onclick="showPage('calendar')">查看行事曆</button></div><div id="homeWeek"></div></div>
+<div class="card"><div class="row"><div><h3>快速新增當期工作</h3><div class="muted">工作時間＋心動值</div></div><button class="btn" onclick="showPage('records');setTimeout(()=>document.getElementById('recordForm').scrollIntoView(),50)">＋ 新增</button></div></div>
+</section>
+
+<section id="calendar" class="page">
+<div class="card"><div class="row"><div><h3>📅 行事曆</h3><div class="muted">只顯示工作時段</div></div><button class="btn small secondary" onclick="openSchedule()">＋ 上班安排</button></div><div id="calendarWrap"></div></div>
+<div class="card"><h3>當日上班安排</h3><div class="muted">可設定工作時間與提醒</div><div id="selectedDateLabel" class="pink" style="margin-top:8px;font-weight:700"></div>
+<label>上班時間</label><input id="schStart" type="time"><label>下班時間</label><input id="schEnd" type="time"><button class="btn" style="margin-top:12px;width:100%" onclick="saveSchedule()">儲存上班安排</button></div>
+<div class="card"><div class="row"><div><h3>提醒通知</h3><div class="muted">上班前提醒、下班前 5 分鐘提醒</div></div><div id="reminderSwitch" class="switch on" onclick="toggleReminder()"><i></i></div></div><div class="notice" style="margin-top:12px">iPhone 背景推播需要將此 PWA 部署到 HTTPS 網站並搭配 Push 服務；本版本同時提供頁面內提醒排程與 PWA Service Worker 基礎架構。</div></div>
+</section>
+
+<section id="records" class="page">
+<div class="card" id="recordForm"><h3>📝 新增每日紀錄</h3>
+<label>工作日期</label><input id="rDate" type="date"><label>上班時間</label><input id="rStart" type="time"><label>下班時間</label><input id="rEnd" type="time"><label>本次心動值</label><input id="rHeart" type="number" inputmode="numeric" placeholder="例如 1000000"><label>備註</label><textarea id="rNote" placeholder="可填寫工作內容"></textarea><label>圖片（可選）</label><input id="rImage" type="file" accept="image/*"><button class="btn" style="width:100%;margin-top:12px" onclick="addWorkRecord()">儲存每日紀錄</button></div>
+<div class="card"><h3>➕ 額外業績</h3><div class="muted">只增加心動值，不增加工作時數</div><label>日期</label><input id="xDate" type="date"><label>額外心動值</label><input id="xHeart" type="number" inputmode="numeric"><label>備註</label><input id="xNote" placeholder="例如下班後補登業績"><button class="btn secondary" style="width:100%;margin-top:12px" onclick="addExtra()">儲存額外業績</button></div>
+<div class="card"><h3>最近紀錄</h3><div id="recordList"></div></div>
+</section>
+
+<section id="stats" class="page">
+<div class="card"><h3>📊 統計中心</h3><div class="grid2"><div class="metric"><div class="label">本期心動值</div><div class="v" id="sHeart">0</div></div><div class="metric"><div class="label">工作時數</div><div class="v" id="sHours">0</div></div><div class="metric"><div class="label">目前抽成</div><div class="v pink" id="sRate">40%</div></div><div class="metric"><div class="label">預估業績收入</div><div class="v pink" id="sPerf">$0</div></div></div></div>
+<div class="card"><h3>🎯 當期多重目標</h3><div id="goals"></div></div>
+<div class="card"><h3>📈 當期心動值趨勢</h3><div id="trend"></div></div>
+</section>
+
+<section id="settings" class="page">
+<div class="card"><h3>⚙️ 基本設定</h3><label>週期開始日（每月）</label><input id="cycleStart" type="number" min="1" max="28"><label>週期結束日（每月）</label><input id="cycleEnd" type="number" min="1" max="31"><label>美金匯率（USD → TWD）</label><input id="fx" type="number" step="0.01"><button class="btn" style="width:100%;margin-top:12px" onclick="saveSettings()">儲存設定</button></div>
+<div class="card"><h3>💰 心動值級距</h3><table><thead><tr><th>級距</th><th>時薪</th><th>抽成</th></tr></thead><tbody><tr><td>≤ 200萬</td><td>40</td><td>40%</td></tr><tr><td>200萬–800萬</td><td>50</td><td>45%</td></tr><tr><td>800萬–1500萬</td><td>60</td><td>50%</td></tr><tr><td>1500萬–3000萬</td><td>70</td><td>55%</td></tr><tr><td>&gt; 3000萬</td><td>70</td><td>65%</td></tr></tbody></table></div>
+<div class="card"><h3>🎁 額外目標</h3><div class="muted">500萬 +500｜1000萬 +1000｜2500萬 +2500；只領最高級距獎金。</div></div>
+<div class="card"><h3>🔔 通知設定</h3><div class="row"><div><b>下班前 5 分鐘提醒</b><div class="muted">可在行事曆中設定每日上下班時間</div></div><div id="reminderSwitch2" class="switch on" onclick="toggleReminder()"><i></i></div></div></div>
+</section>
+</main>
+<nav>
+<button onclick="showPage('home')" data-page="home" class="activeNav"><span class="navicon">🏠</span>首頁</button>
+<button onclick="showPage('calendar')" data-page="calendar"><span class="navicon">📅</span>行事曆</button>
+<button onclick="showPage('records')" data-page="records"><span class="navicon">📝</span>紀錄</button>
+<button onclick="showPage('stats')" data-page="stats"><span class="navicon">📊</span>統計</button>
+<button onclick="showPage('settings')" data-page="settings"><span class="navicon">⚙️</span>設定</button>
+</nav></div><div id="toast" class="toast"></div>
+<script>
+const KEY='mianmian_v26';
+const defaultState={settings:{cycleStart:26,cycleEnd:25,fx:29,reminder:true},records:[],schedules:{}};
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||defaultState, selectedDate=today();
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function today(){return new Date().toISOString().slice(0,10)}
+function fmt(n){return Math.round(n||0).toLocaleString('zh-TW')}
+function toast(t){let e=document.getElementById('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800)}
+function showPage(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('activeNav',x.dataset.page===id));renderAll();scrollTo(0,0)}
+function cycleRange(){let now=new Date(),y=now.getFullYear(),m=now.getMonth(),d=now.getDate(),s=+state.settings.cycleStart,e=+state.settings.cycleEnd;let sy=y,sm=m;if(d<s){sm--;if(sm<0){sm=11;sy--}}let start=new Date(sy,sm,s);let ey=sy,em=sm;if(e<s){em++;if(em>11){em=0;ey++}}let end=new Date(ey,em,e,23,59,59);return {start,end}}
+function inCycle(date){let d=new Date(date+'T00:00:00');let r=cycleRange();return d>=r.start&&d<=r.end}
+function tier(h){if(h<=2000000)return{rate:.4,wage:40,next:2000000};if(h<=8000000)return{rate:.45,wage:50,next:8000000};if(h<=15000000)return{rate:.5,wage:60,next:15000000};if(h<=30000000)return{rate:.55,wage:70,next:30000000};return{rate:.65,wage:70,next:null}}
+function allCycleRecords(){return state.records.filter(r=>inCycle(r.date))}
+function cycleHeart(){return allCycleRecords().reduce((a,r)=>a+(+r.heart||0),0)}
+function cycleHours(){return allCycleRecords().reduce((a,r)=>a+(r.type==='extra'?0:duration(r.start,r.end)),0)}
+function duration(a,b){if(!a||!b)return 0;let [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let x=bh*60+bm-(ah*60+am);if(x<0)x+=1440;return x/60}
+function income(){let h=cycleHeart(),t=tier(h),perf=h*t.rate/12000*+state.settings.fx||0,base=cycleHours()*t.wage;let bonus=h>=25000000?2500:h>=10000000?1000:h>=5000000?500:0;return {perf,base,bonus,total:perf+base+bonus}}
+function weekRange(){let d=new Date(),day=d.getDay(),diff=(day+6)%7,s=new Date(d);s.setDate(d.getDate()-diff);let e=new Date(s);e.setDate(s.getDate()+6);return [s,e]}
+function weekHeart(){let [s,e]=weekRange();return state.records.filter(r=>{let d=new Date(r.date+'T00:00:00');return d>=s&&d<=e}).reduce((a,r)=>a+(+r.heart||0),0)}
+function renderHome(){let h=cycleHeart(),t=tier(h),i=income();document.getElementById('homeHeart').textContent=fmt(h);document.getElementById('tierLine').textContent=`目前抽成 ${Math.round(t.rate*100)}%｜時薪 NT$${t.wage}`;document.getElementById('homeHours').textContent=cycleHours().toFixed(1)+' 小時';document.getElementById('homeIncome').textContent='NT$ '+fmt(i.total);let wh=weekHeart(),pct=Math.min(100,wh/3000000*100);document.getElementById('weekGoal').textContent=pct.toFixed(1)+'%';document.getElementById('weekBar').style.width=pct+'%';document.getElementById('nextTier').textContent=t.next?fmt(Math.max(0,t.next-h)):'已達最高';document.getElementById('nextTierPct').textContent=t.next?((h/t.next)*100).toFixed(1)+'% 已完成':'65% 目前最高抽成';renderHomeWeek()}
+function renderHomeWeek(){document.getElementById('homeWeek').innerHTML=weekHTML()}
+function weekHTML(){let [s,e]=weekRange(),days=[];for(let i=0;i<7;i++){let d=new Date(s);d.setDate(s.getDate()+i);let ds=d.toISOString().slice(0,10),sh=state.schedules[ds];let rec=state.records.filter(r=>r.date===ds&&r.type!=='extra');days.push(`<div class="day ${ds===today()?'today':''}"><div>${['一','二','三','四','五','六','日'][i]}</div><div class="num">${d.getDate()}</div>${sh?`<div class="shift">${sh.start}–${sh.end}</div>`:''}${rec.map(r=>`<div class="shift">${r.start}–${r.end}</div>`).join('')}</div>`)}return `<div class="week">${days.join('')}</div>`}
+function renderCalendar(){let r=cycleRange(),month=new Date(selectedDate+'T00:00:00'),y=month.getFullYear(),m=month.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0),start=(first.getDay()+6)%7,total=Math.ceil((start+last.getDate())/7)*7;let html=`<div class="row" style="margin:10px 0"><button class="btn small secondary" onclick="changeMonth(-1)">‹</button><b>${y} 年 ${m+1} 月</b><button class="btn small secondary" onclick="changeMonth(1)">›</button></div><div class="week">`;for(let i=0;i<total;i++){let n=i-start+1;if(n<1||n>last.getDate()){html+='<div></div>';continue}let ds=`${y}-${String(m+1).padStart(2,'0')}-${String(n).padStart(2,'0')}`, rec=state.records.filter(x=>x.date===ds&&x.type!=='extra'),sch=state.schedules[ds];html+=`<div class="day ${ds===selectedDate?'today':''}" onclick="selectDate('${ds}')"><div>${['日','一','二','三','四','五','六'][new Date(ds+'T00:00:00').getDay()]}</div><div class="num">${n}</div>${sch?`<div class="shift">${sch.start}–${sch.end}</div>`:''}${rec.map(x=>`<div class="shift">${x.start}–${x.end}</div>`).join('')}</div>`}html+='</div>';document.getElementById('calendarWrap').innerHTML=html;loadSchedule()}
+function changeMonth(n){let d=new Date(selectedDate+'T00:00:00');d.setMonth(d.getMonth()+n);selectedDate=d.toISOString().slice(0,10);renderCalendar()}
+function selectDate(ds){selectedDate=ds;renderCalendar();toast('已選擇 '+ds)}
+function openSchedule(){document.getElementById('calendarWrap').scrollIntoView({behavior:'smooth'});loadSchedule()}
+function loadSchedule(){document.getElementById('selectedDateLabel').textContent='選擇日期：'+selectedDate;let s=state.schedules[selectedDate];document.getElementById('schStart').value=s?.start||'';document.getElementById('schEnd').value=s?.end||''}
+function saveSchedule(){let a=document.getElementById('schStart').value,b=document.getElementById('schEnd').value;if(!a||!b)return toast('請填寫上下班時間');state.schedules[selectedDate]={start:a,end:b};save();renderCalendar();renderHomeWeek();toast('上班安排已儲存')}
+function addWorkRecord(){let date=document.getElementById('rDate').value||today(),start=document.getElementById('rStart').value,end=document.getElementById('rEnd').value,heart=+document.getElementById('rHeart').value||0;if(!start||!end||heart<=0)return toast('請完整填寫日期、時間與心動值');let same=state.records.some(r=>r.date===date&&r.type!=='extra');if(same)toast('今日已登打過一次業績，將會累計數據');state.records.unshift({id:Date.now(),type:'work',date,start,end,heart,note:document.getElementById('rNote').value});save();clearRecord();renderAll();toast('每日紀錄已新增')}
+function addExtra(){let date=document.getElementById('xDate').value||today(),heart=+document.getElementById('xHeart').value||0;if(heart<=0)return toast('請輸入額外心動值');state.records.unshift({id:Date.now(),type:'extra',date,heart,note:document.getElementById('xNote').value});save();document.getElementById('xHeart').value='';document.getElementById('xNote').value='';renderAll();toast('額外業績已新增，不增加工作時數')}
+function clearRecord(){['rStart','rEnd','rHeart','rNote'].forEach(id=>document.getElementById(id).value='');document.getElementById('rImage').value=''}
+function renderRecords(){let el=document.getElementById('recordList');if(!state.records.length){el.innerHTML='<div class="muted">目前沒有紀錄</div>';return}el.innerHTML=state.records.slice(0,12).map(r=>`<div class="item"><div class="row"><div><span class="tag">${r.type==='extra'?'額外業績':'工作紀錄'}</span> <b>${r.date}</b></div><button class="btn small secondary" onclick="delRecord(${r.id})">刪除</button></div>${r.type!=='extra'?`<div style="margin-top:6px">${r.start}–${r.end}｜${duration(r.start,r.end).toFixed(1)} 小時</div>`:''}<div class="pink" style="margin-top:4px">+ ${fmt(r.heart)} 心動值</div>${r.note?`<div class="muted">${r.note}</div>`:''}</div>`).join('')}
+function delRecord(id){state.records=state.records.filter(r=>r.id!==id);save();renderAll();toast('已刪除')}
+function renderStats(){let h=cycleHeart(),t=tier(h),i=income();document.getElementById('sHeart').textContent=fmt(h);document.getElementById('sHours').textContent=cycleHours().toFixed(1);document.getElementById('sRate').textContent=Math.round(t.rate*100)+'%';document.getElementById('sPerf').textContent='NT$ '+fmt(i.perf);let gs=[['500萬',5000000,500],['1000萬',10000000,1000],['2500萬',25000000,2500]];document.getElementById('goals').innerHTML=gs.map(g=>{let p=Math.min(100,h/g[1]*100);return `<div style="margin:13px 0"><div class="row"><span>${g[0]}｜獎金 NT$${g[2]}</span><b>${p.toFixed(1)}%</b></div><div class="progress"><div class="bar" style="width:${p}%"></div></div></div>`}).join('');let rs=allCycleRecords().slice().sort((a,b)=>a.date.localeCompare(b.date));document.getElementById('trend').innerHTML=rs.length?rs.slice(-14).map(r=>`<div class="item"><div class="row"><span>${r.date}</span><b>${fmt(r.heart)}</b></div><div class="progress"><div class="bar" style="width:${Math.min(100,(r.heart/3000000)*100)}%"></div></div></div>`).join(''):'<div class="muted">本期尚無資料</div>'}
+function renderSettings(){document.getElementById('cycleStart').value=state.settings.cycleStart;document.getElementById('cycleEnd').value=state.settings.cycleEnd;document.getElementById('fx').value=state.settings.fx;setSwitch()}
+function saveSettings(){let s=+document.getElementById('cycleStart').value,e=+document.getElementById('cycleEnd').value,fx=+document.getElementById('fx').value;if(s<1||s>28||e<1||e>31||fx<=0)return toast('設定值不正確');state.settings.cycleStart=s;state.settings.cycleEnd=e;state.settings.fx=fx;save();renderAll();toast('設定已儲存')}
+function setSwitch(){['reminderSwitch','reminderSwitch2'].forEach(id=>document.getElementById(id).classList.toggle('on',!!state.settings.reminder))}
+function toggleReminder(){state.settings.reminder=!state.settings.reminder;save();setSwitch();toast(state.settings.reminder?'提醒已開啟':'提醒已關閉')}
+async function requestNotification(){if('Notification'in window&&Notification.permission==='default')await Notification.requestPermission()}
+function schedulePageReminder(){if(!state.settings.reminder)return;let s=state.schedules[today()];if(!s)return;let [h,m]=s.end.split(':').map(Number),target=new Date();target.setHours(h,m-5,0,0);let diff=target-Date.now();if(diff>0&&diff<86400000)setTimeout(()=>{if(Notification.permission==='granted')new Notification('眠眠的直播日誌',{body:'距離今天下班時間還有 5 分鐘 💗'});else toast('距離今天下班還有 5 分鐘');},diff)}
+function renderAll(){document.getElementById('cycleLabel').textContent=`本期：${cycleRange().start.toLocaleDateString('zh-TW')} ～ ${cycleRange().end.toLocaleDateString('zh-TW')}`;renderHome();renderCalendar();renderRecords();renderStats();renderSettings()}
+document.getElementById('rDate').value=today();document.getElementById('xDate').value=today();renderAll();requestNotification();schedulePageReminder();
+if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+</script>
+</body></html>
